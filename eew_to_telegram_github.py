@@ -110,6 +110,4 @@ def main():
 
     save_seen(seen)
 
-if __name__ == "__main__":
-    main()
-send_telegram("GitHub Actions EEW Bot: テスト通知 OK")
+
