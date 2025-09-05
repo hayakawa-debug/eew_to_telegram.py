@@ -5,8 +5,9 @@ import requests
 import xml.etree.ElementTree as ET
 import subprocess
 
-FEED_URL = "https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml"
-EEW_KEYWORDS = ("緊急地震速報（予報", "緊急地震速報（警報", "緊急地震速報（地震動予報")
+# --- 設定 ---
+FEED_URL = "https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml"  # EEW 高頻度フィード
+EEW_KEYWORDS = ("緊急地震速報",)  # タイトルに含まれる文字列で簡易判定
 STATE_FILE = "./seen_ids.json"
 
 TELEGRAM_TOKEN = os.environ["TELEGRAM_TOKEN"]
@@ -24,7 +25,6 @@ def load_seen():
 def save_seen(seen):
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(list(seen), f, ensure_ascii=False)
-
     # GitHub に push
     subprocess.run(["git", "config", "user.name", "github-actions"])
     subprocess.run(["git", "config", "user.email", "actions@github.com"])
@@ -57,7 +57,7 @@ def fetch_feed_entries():
         entries.append({"title": title, "id": id_, "href": href})
     return entries
 
-# --- XML 本文から要約 ---
+# --- XML 本文要約 ---
 def fetch_and_summarize_xml(xml_url):
     r = requests.get(xml_url, timeout=15)
     r.raise_for_status()
@@ -66,27 +66,13 @@ def fetch_and_summarize_xml(xml_url):
     title = root.findtext(".//{*}Title") or ""
     report_time = root.findtext(".//{*}ReportDateTime") or ""
     headline = root.findtext(".//{*}Headline//{*}Text") or ""
-    serial = root.findtext(".//{*}Serial") or ""
-    info_type = root.findtext(".//{*}InfoType") or ""
-    target_time = root.findtext(".//{*}TargetDateTime") or ""
-    hypocenter = root.findtext(".//{*}Hypocenter//{*}Name") or ""
-    magnitude = root.findtext(".//{*}Magnitude") or ""
-    maxint = root.findtext(".//{*}Intensity//{*}MaxInt") or ""
 
     lines = []
-    if title:        lines.append(f"<b>{html.escape(title)}</b>")
-    if serial:       lines.append(f"・報号: {html.escape(serial)}")
-    if info_type:    lines.append(f"・種別: {html.escape(info_type)}")
-    if report_time:  lines.append(f"・発表: {html.escape(report_time)}")
-    if target_time:  lines.append(f"・基点: {html.escape(target_time)}")
-    if hypocenter:   lines.append(f"・震源: {html.escape(hypocenter)}")
-    if magnitude:    lines.append(f"・M: {html.escape(magnitude)}")
-    if maxint:       lines.append(f"・最大震度: {html.escape(maxint)}")
-    if headline:     lines.append("\n" + html.escape(headline))
-
+    if title:       lines.append(f"<b>{html.escape(title)}</b>")
+    if report_time: lines.append(f"・発表: {html.escape(report_time)}")
+    if headline:    lines.append("\n" + html.escape(headline))
     if not lines:
-        lines = [f"<b>緊急地震速報</b>", f"{html.escape(xml_url)}"]
-
+        lines = [f"<b>緊急地震速報</b>", xml_url]
     return "\n".join(lines)
 
 def is_eew(title: str) -> bool:
@@ -97,6 +83,7 @@ def main():
     entries = fetch_feed_entries()
 
     for en in entries:
+        print("Feed entry:", en["title"])  # ログ出力で確認
         if not en["href"] or not en["id"]:
             continue
         if en["id"] in seen:
@@ -110,4 +97,5 @@ def main():
 
     save_seen(seen)
 
-
+if __name__ == "__main__":
+    main()
