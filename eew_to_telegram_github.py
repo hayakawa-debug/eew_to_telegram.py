@@ -99,3 +99,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+send_telegram("GitHub Actions EEW Bot: テスト送信 OK")
