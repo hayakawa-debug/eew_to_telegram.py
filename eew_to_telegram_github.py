@@ -7,10 +7,10 @@ import subprocess
 
 # --- 設定 ---
 FEED_URLS = [
-    "https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml",  # 全般
-    "https://www.data.jma.go.jp/developer/xml/data/VXSE51.xml", # EEW 予報・警報
-    "https://www.data.jma.go.jp/developer/xml/data/VXSE52.xml", # EEW 地震動予報
+    "https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml",   # 高頻度
+    "https://www.data.jma.go.jp/developer/xml/feed/eew.xml",     # EEW 専用フィード（※存在する）
 ]
+
 
 
 EEW_KEYWORDS = ("緊急地震速報",)  # タイトルに含まれる文字列で簡易判定
