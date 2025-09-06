@@ -43,6 +43,11 @@ def send_telegram(text):
     r = requests.post(TG_API, json=payload, timeout=10)
     r.raise_for_status()
 
+def is_target(title: str) -> bool:
+    keywords = ["震度速報", "震源に関する情報", "緊急地震速報"]
+    return any(k in title for k in keywords)
+
+
 # --- Atom フィード取得 ---
 def fetch_feed_entries():
     entries = []
