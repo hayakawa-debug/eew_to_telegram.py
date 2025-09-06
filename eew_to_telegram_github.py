@@ -12,20 +12,6 @@ FEED_URLS = [
     "https://www.data.jma.go.jp/developer/xml/data/VXSE52.xml", # EEW 地震動予報
 ]
 
-# --- Atom フィード取得 ---
-def fetch_feed_entries():
-    entries = []
-    for url in FEED_URLS:
-        r = requests.get(url, timeout=15)
-        r.raise_for_status()
-        root = ET.fromstring(r.content)
-        for e in root.findall(".//{*}entry"):
-            title = (e.findtext("{*}title") or "").strip()
-            id_ = (e.findtext("{*}id") or "").strip()
-            link_el = e.find("{*}link")
-            href = link_el.get("href") if link_el is not None else None
-            entries.append({"title": title, "id": id_, "href": href})
-    return entries
 
 EEW_KEYWORDS = ("緊急地震速報",)  # タイトルに含まれる文字列で簡易判定
 STATE_FILE = "./seen_ids.json"
@@ -65,17 +51,19 @@ def send_telegram(text):
 
 # --- Atom フィード取得 ---
 def fetch_feed_entries():
-    r = requests.get(FEED_URL, timeout=15)
-    r.raise_for_status()
-    root = ET.fromstring(r.content)
     entries = []
-    for e in root.findall(".//{*}entry"):
-        title = (e.findtext("{*}title") or "").strip()
-        id_ = (e.findtext("{*}id") or "").strip()
-        link_el = e.find("{*}link")
-        href = link_el.get("href") if link_el is not None else None
-        entries.append({"title": title, "id": id_, "href": href})
+    for url in FEED_URLS:
+        r = requests.get(url, timeout=15)
+        r.raise_for_status()
+        root = ET.fromstring(r.content)
+        for e in root.findall(".//{*}entry"):
+            title = (e.findtext("{*}title") or "").strip()
+            id_ = (e.findtext("{*}id") or "").strip()
+            link_el = e.find("{*}link")
+            href = link_el.get("href") if link_el is not None else None
+            entries.append({"title": title, "id": id_, "href": href})
     return entries
+
 
 # --- XML 本文要約 ---
 def fetch_and_summarize_xml(xml_url):
