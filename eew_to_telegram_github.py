@@ -6,12 +6,13 @@ import xml.etree.ElementTree as ET
 import subprocess
 
 # --- 設定 ---
-# 監視対象フィードを複数に
 FEED_URLS = [
     "https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml",  # 全般
     "https://www.data.jma.go.jp/developer/xml/data/VXSE51.xml", # EEW 予報・警報
     "https://www.data.jma.go.jp/developer/xml/data/VXSE52.xml", # EEW 地震動予報
 ]
+
+# --- Atom フィード取得 ---
 def fetch_feed_entries():
     entries = []
     for url in FEED_URLS:
@@ -25,6 +26,7 @@ def fetch_feed_entries():
             href = link_el.get("href") if link_el is not None else None
             entries.append({"title": title, "id": id_, "href": href})
     return entries
+
 EEW_KEYWORDS = ("緊急地震速報",)  # タイトルに含まれる文字列で簡易判定
 STATE_FILE = "./seen_ids.json"
 
