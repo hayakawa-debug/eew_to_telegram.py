@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 import subprocess
 
 # --- 設定 ---
-FEED_URLS = "https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml",   # 高頻度
+FEED_URL = "https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml",   # 高頻度
 EEW_KEYWORDS = ("緊急地震速報",)  # タイトルに含まれる文字列で簡易判定
 STATE_FILE = "./seen_ids.json"
 
@@ -46,7 +46,7 @@ def send_telegram(text):
 # --- Atom フィード取得 ---
 def fetch_feed_entries():
     entries = []
-    for url in FEED_URLS:
+    for url in FEED_URL:
         r = requests.get(url, timeout=15)
         r.raise_for_status()
         root = ET.fromstring(r.content)
@@ -78,7 +78,7 @@ def fetch_and_summarize_xml(xml_url):
     return "\n".join(lines)
 
 def is_eew(title: str) -> bool:
-    return any(k in title for k in EEW_KEYWORDS)
+    return True  # まずは全件通知
 
 def main():
     seen = load_seen()
