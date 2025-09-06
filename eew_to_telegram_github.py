@@ -78,8 +78,8 @@ def fetch_and_summarize_xml(xml_url):
     return "\n".join(lines)
 
 def is_eew(title: str) -> bool:
-    return True  # まずは全件通知
-
+    return any(k in title for k in EEW_KEYWORDS)
+    
 def main():
     seen = load_seen()
     entries = fetch_feed_entries()
