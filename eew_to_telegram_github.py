@@ -6,7 +6,25 @@ import xml.etree.ElementTree as ET
 import subprocess
 
 # --- 設定 ---
-FEED_URL = "https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml"  # EEW 高頻度フィード
+# 監視対象フィードを複数に
+FEED_URLS = [
+    "https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml",  # 全般
+    "https://www.data.jma.go.jp/developer/xml/data/VXSE51.xml", # EEW 予報・警報
+    "https://www.data.jma.go.jp/developer/xml/data/VXSE52.xml", # EEW 地震動予報
+]
+def fetch_feed_entries():
+    entries = []
+    for url in FEED_URLS:
+        r = requests.get(url, timeout=15)
+        r.raise_for_status()
+        root = ET.fromstring(r.content)
+        for e in root.findall(".//{*}entry"):
+            title = (e.findtext("{*}title") or "").strip()
+            id_ = (e.findtext("{*}id") or "").strip()
+            link_el = e.find("{*}link")
+            href = link_el.get("href") if link_el is not None else None
+            entries.append({"title": title, "id": id_, "href": href})
+    return entries
 EEW_KEYWORDS = ("緊急地震速報",)  # タイトルに含まれる文字列で簡易判定
 STATE_FILE = "./seen_ids.json"
 
