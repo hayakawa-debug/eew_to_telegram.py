@@ -6,13 +6,7 @@ import xml.etree.ElementTree as ET
 import subprocess
 
 # --- 設定 ---
-FEED_URLS = [
-    "https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml",   # 高頻度
-    "https://www.data.jma.go.jp/developer/xml/feed/eew.xml",     # EEW 専用フィード（※存在する）
-]
-
-
-
+FEED_URLS = "https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml",   # 高頻度
 EEW_KEYWORDS = ("緊急地震速報",)  # タイトルに含まれる文字列で簡易判定
 STATE_FILE = "./seen_ids.json"
 
