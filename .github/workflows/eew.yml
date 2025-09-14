@@ -1,28 +1,27 @@
-name: Earthquake Notification
+name: EEW Telegram Notifier
 
 on:
   schedule:
-    - cron: "*/1 * * * *"   # 毎分実行
-  workflow_dispatch:
+    - cron: "*/1 * * * *"  # 1分ごと
+  workflow_dispatch:  # 手動実行も可能
 
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.x"
+          python-version: "3.11"
 
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run Earthquake Notification
+      - name: Run EEW notifier
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          GIST_ID: ${{ secrets.GIST_ID }}
-          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-        run: python telegrambot.py
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python eew_to_telegram_github.py
